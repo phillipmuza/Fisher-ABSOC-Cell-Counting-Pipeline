@@ -26,8 +26,8 @@ It is recommnended to use an autofluorescence image to register to the CCFv3, ho
 
 Summary of the registration workflow:
   1. Pre-process your images in ImageJ/Fiji - record your processing as this will be applied to the cell signal image 
-  2. Run the [batch_registrations.ijm](../registration/fiji) macro - this can run recursively 
-  3. In Python run [registration_script.py](../registration/python) - if you want to run recursively, it can be done using [registration_recursive.py](../registration/python)
+  2. Run the [batch_registrations.ijm](/registration/fiji) macro - this can run recursively 
+  3. In Python run [registration_script.py](/registration/python) - if you want to run recursively, it can be done using [registration_recursive.py](/registration/python)
     - This script will need your input to the path of the atlas you want to register
   4. Export pixel coordinates from auto_downsampled.tif and annotation.tif using [export_coordinates.imj](../registration/fiji) - this can run recursively
     - It is recommended to only leave auto_downsampled.tif and annotation.tif in your working directory, otherwise all .tif files will get processed 
@@ -35,10 +35,10 @@ Summary of the registration workflow:
 ## Cell Segmentation 
 Summary of the cell segmentation workflow:
   1. Pre-process images in ImageJ/Fiji - if you have the macro from the registration workflow, run it for the cell signal images - this way you are operating in the same space for both images (VERY IMPORTANT)
-  2. Run [batch_signal_analysis.imj](../cell_segmentation) macro - this can run recursively
+  2. Run [batch_signal_analysis.imj](/cell_segmentation) macro - this can run recursively
       - **Note: this macro is a generic script - you need to modify it to suit your experimental needs **
       
  ## Register cells to appropriate brain regions
  This process is completed entirely in R (RStudio). You will "auto_downsampled_xyz.txt", "annotation_xyz.txt", "objects_xyz.csv" for a given animal in the same directory. You can either move them to a new directory or move files from registrations to cell_segmentation - whichever you prefer, as long as they are in the same directory. Following that, to register cells to appropriate brain regions:
-  1. Run ["cell_counting_pipeline.R"](../R_scripts) - this script runs recursively, **make sure to set the correct parameters** 
+  1. Run ["cell_counting_pipeline.R"](/R_scripts) - this script runs recursively, **make sure to set the correct parameters** 
   2. Output should be datatable (csv) of the total cell counts and volume of every brain region in the brain slice with > 1 cell  
