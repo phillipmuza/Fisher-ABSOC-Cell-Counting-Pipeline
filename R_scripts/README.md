@@ -1,0 +1,1 @@
+**This process is completed entirely in R (RStudio). You will "auto_downsampled_xyz.txt", "annotation_xyz.txt", "objects_xyz.csv" for a given animal in the same directory. You can either move them to a new directory or move files from registrations to cell_segmentation - whichever you prefer, as long as they are in the same directory.**
