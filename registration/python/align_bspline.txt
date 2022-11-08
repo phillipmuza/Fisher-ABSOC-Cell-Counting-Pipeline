@@ -1,0 +1,63 @@
+//Bspline Transformation
+
+//ImageTypes
+(FixedInternalImagePixelType "float")
+(FixedImageDimension 3)
+(MovingInternalImagePixelType "float")
+(MovingImageDimension 3)
+
+//Components
+(Registration "MultiResolutionRegistration")
+(FixedImagePyramid "FixedSmoothingImagePyramid")
+(MovingImagePyramid "MovingSmoothingImagePyramid")
+(Interpolator "BSplineInterpolator")
+(Metric "AdvancedMattesMutualInformation")
+(Optimizer "AdaptiveStochasticGradientDescent")
+(ResampleInterpolator "FinalBSplineInterpolator")
+(Resampler "DefaultResampler")
+(Transform "RecursiveBSplineTransform")
+(ASGDParameterEstimationMethod "DisplacementDistribution")
+
+(ErodeMask "false" )
+
+(NumberOfResolutions 3)
+(FinalGridSpacingInVoxels 4.000000 4.000000 4.000000)
+(GridSpacingSchedule 8.0 8.0 8.0 4.0 4.0 4.0 2.0 2.0 2.0)
+
+(HowToCombineTransforms "Compose")
+
+(WriteTransformParametersEachIteration "false")
+(WriteResultImage "true")
+(CompressResultImage "false")
+(WriteResultImageAfterEachResolution "false")
+(ShowExactMetricValue "false")
+(WriteDiffusionFiles "true")
+
+// Option supported in elastix 4.1:
+(UseFastAndLowMemoryVersion "true")
+
+//Maximum number of iterations in each resolution level:
+(MaximumNumberOfIterations 256 ) 
+
+//Number of spatial samples used to compute the mutual information in each resolution level:
+(ImageSampler "RandomCoordinate")
+(FixedImageBSplineInterpolationOrder 3 )
+(NumberOfSpatialSamples 2000 )
+(NewSamplesEveryIteration "true")
+(CheckNumberOfSamples "true")
+(MaximumNumberOfSamplingAttempts 8)
+
+//Order of B-Spline interpolation used in each resolution level:
+(BSplineInterpolationOrder 3)
+
+//Order of B-Spline interpolation used for applying the final deformation:
+(FinalBSplineInterpolationOrder 3)
+
+//Default pixel value for pixels that come from outside the picture:
+(DefaultPixelValue 0)
+
+//SP: Param_A in each resolution level. a_k = a/(A+k+1)^alpha
+(SP_A 1000.0 )
+
+
+

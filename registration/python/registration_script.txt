@@ -1,0 +1,106 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue 18 Jan 
+
+@author: pmuza
+"""
+from __future__ import division
+import os, sys, glob, shutil, time, SimpleITK as sitk
+
+#Set the path to the resources folder 
+def directories():
+    global resources_path, elastix_path, CCFv3_atlas 
+    resources_path = os.path.abspath(" ") #Path to registration folder
+    os.makedirs("elastix", exist_ok=True)
+    elastix_path = os.path.abspath("elastix")
+    CCFv3_atlas = os.path.abspath("25um_ABA") #CHANGE THIS TO PATH OF REFERENCE AND ANNOTATION FILES
+    global align_affine_file, align_bspline_file, reference_file, annotation_file # make path to parameter and atlas files
+    align_affine_file = os.path.join(resources_path, "registration/python/align_affine.txt")
+    align_bspline_file = os.path.join(resources_path, "registration/python/align_bspline.txt")
+    reference_file = os.path.join(CCFv3_atlas, "reference.tif") #NAME OF REFERENCE IMAGE FILE
+    annotation_file = os.path.join(CCFv3_atlas, "annotation.tif") #NAME OF ANNOTATION IMAGE FILE
+    
+#%% Import images and parameter maps
+#Function to scale fixed Images so they match the spacing of moving Images
+def scalingFactor(movingImagePixelResolution, fixedImagePixelResolution):
+    fixedImage_list = list(fixedImagePixelResolution)
+    movingImage_list = list(movingImagePixelResolution)
+    scaling = [float(i) / float(a) for i,a in zip(movingImage_list, fixedImage_list)]
+    return(scaling)
+
+#Function to Import Images
+def importImage(image):
+    imageName = sitk.ReadImage(image)
+    imageName_mask = imageName>0
+    imageName_mask = imageName*sitk.Cast(imageName_mask, imageName.GetPixelID())
+    return(imageName_mask)
+
+
+def imageImports():
+    global annotationImage, movingImage, fixedImage
+    annotationImage = sitk.ReadImage(annotation_file)
+    movingImage = importImage(reference_file)
+    filename = glob.glob("*downsampled.tif")
+    fixedImage = importImage(filename[0])
+    #change spacing here
+    downsampling = scalingFactor(movingImage.GetSize(), fixedImage.GetSize())
+    fixedImage.SetSpacing(downsampling)
+  
+
+#%% Run Elastix
+#This function will run elastix 
+def runElastix():
+    p_affine = sitk.ReadParameterFile(align_affine_file)
+    p_bspline = sitk.ReadParameterFile(align_bspline_file)
+    elastixImageFilter = sitk.ElastixImageFilter()
+    elastixImageFilter.SetFixedImage(fixedImage)
+    elastixImageFilter.SetMovingImage(movingImage)
+    parameterMapVector = sitk.VectorOfParameterMap()
+    parameterMapVector.append(p_affine)
+    parameterMapVector.append(p_bspline)    
+    elastixImageFilter.SetParameterMap(parameterMapVector)
+    elastixImageFilter.Execute()
+    resultImage = elastixImageFilter.GetResultImage()
+    sitk.WriteImage(resultImage, "elastix/registered_reference.tif")
+    
+#This function will search and retrieve files with .txt extension in source directory
+def moveFiles():
+    cwd = os.getcwd()
+    source_files, source_folder, target_folder, = "*.txt", cwd, elastix_path
+    filelist = glob.glob(source_files)
+    for file in filelist:
+        shutil.move(os.path.join(source_folder, file), os.path.join(target_folder, file))
+
+
+#%% Run Transformix
+#This function will run transformix
+def runTransformix():
+    transformix_parameters_0 = os.path.join(elastix_path, "TransformParameters.0.txt")
+    transformix_parameters_1 = os.path.join(elastix_path, "TransformParameters.1.txt")
+    parameterMap_transformix_0 = sitk.ReadParameterFile(transformix_parameters_0)
+    parameterMap_transformix_1 = sitk.ReadParameterFile(transformix_parameters_1)
+    parameterMap_transformix_0["FinalBSplineInterpolationOrder"] = ["0"]
+    parameterMap_transformix_1["FinalBSplineInterpolationOrder"] = ["0"]
+    transformixImageFilter = sitk.TransformixImageFilter() 
+    transformixImageFilter.SetMovingImage(annotationImage)
+    transformixImageFilter.SetTransformParameterMap(parameterMap_transformix_0)
+    transformixImageFilter.AddTransformParameterMap(parameterMap_transformix_1)                                                
+    transformixImageFilter.Execute()
+    transformix_resultImage = transformixImageFilter.GetResultImage()
+    sitk.WriteImage(transformix_resultImage,"annotation.tif")
+
+
+#%% Run main()
+def main():
+    start = time.time()
+    directories()
+    imageImports()
+    runElastix()
+    print("Duration of Elastix: {} seconds".format(time.time() - start))
+    moveFiles()
+    runTransformix()
+    print("Duration of Elastix + Transformix: {} seconds".format(time.time() - start))
+
+
+
+print("Now starting registration...")    
