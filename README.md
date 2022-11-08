@@ -41,4 +41,4 @@ Summary of the cell segmentation workflow:
  ## Register cells to appropriate brain regions
  This process is completed entirely in R (RStudio). You will "auto_downsampled_xyz.txt", "annotation_xyz.txt", "objects_xyz.csv" for a given animal in the same directory. You can either move them to a new directory or move files from registrations to cell_segmentation - whichever you prefer, as long as they are in the same directory. Following that, to register cells to appropriate brain regions:
   1. Run ["cell_counting_pipeline.R"](/R_scripts) - this script runs recursively, **make sure to set the correct parameters** 
-  2. Output should be datatable (csv) of the total cell counts and volume of every brain region in the brain slice with > 1 cell  
+  2. Output should be a table (csv) of the total cell counts and volume of every brain region in the brain slice with > 1 cell  
