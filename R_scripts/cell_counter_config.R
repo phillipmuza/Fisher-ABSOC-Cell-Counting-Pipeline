@@ -127,6 +127,7 @@ cell_and_volume_df <- function(cell_regions, volume_regions, save_filename){
   df <- subset(df, select = -c(Freq))
   df <- df[, c("name","acronym","structure_id_path","id",
                "parent_structure_id","n", "cell_size", "volume(mm^3)")]
+  colnames(df)[8] <- 'region_volume(mm^3)'
   df$cell_size <- sapply(df$cell_size, paste, collapse = '')
   write.csv(df, file = save_filename)
   return(df)
