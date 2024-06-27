@@ -7,7 +7,8 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse,
                stringr,
-               janitor)
+               janitor,
+               splitstackshape)
 
 ### 1. Functions to upload your tables appropriately  --------------------------
 
@@ -83,12 +84,12 @@ cell_locations <- function(cell_coordinates, region_coordinates){
 subset_volumes_in_threes <- function(dataframe) {
   volumes <- c(unique(dataframe$Volume)) #Create a list of the unique values of volumes
   volumes_sorted <- sort(volumes) #Sort volumes in ascending order
-  volume_chunks <- split(volumes, ceiling(seq_along(volumes)/3)) #Split volumes into a list of 3
+  volume_chunks <- split(volumes_sorted, cut(seq_along(volumes_sorted), breaks=3, labels = FALSE)) #Split volumes into a list of 3
   sizes <- c('small', 'medium', 'large')
   volume_chunks <- setNames(as.list(volume_chunks), sizes) #Give volume chunks names
   volume_chunks_df <- as.data.frame(do.call(cbind, volume_chunks)) #convert list of volume_chunks into a dataframe
   return(volume_chunks_df)
-}
+  }
 
 #This function identifies a unique volume value and categories it based on its size
 get_column_name <- function(dataframe, target_value) {
